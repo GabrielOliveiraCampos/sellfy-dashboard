@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellfy Group — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --o:#FE4F18;--obg:rgba(254,79,24,.1);--obr:rgba(254,79,24,.22);
+  --bk:#0C0F12;--s1:#13171b;--s2:#191d22;--s3:#1e2328;--s4:#242930;
+  --cr:#F1F1EC;--gr:#22c55e;--grbg:rgba(34,197,94,.1);--grbr:rgba(34,197,94,.22);
+  --re:#ef4444;--rebg:rgba(239,68,68,.1);--rebr:rgba(239,68,68,.22);
+  --mu:#4a5261;--mu2:#8b95a1;--mu3:#c4cdd8;
+  --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.12);
+  --r:8px;--font:'Poppins',sans-serif;
+}
+html{background:var(--bk);color:var(--cr);font-family:var(--font);-webkit-font-smoothing:antialiased}
+
+/* ── Topbar ── */
+.topbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--s1);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:12px}
+.logo{height:22px;width:auto}
+.sep{width:1px;height:18px;background:var(--bd2)}
+.lbl{font-size:9.5px;font-weight:700;letter-spacing:2px;color:var(--mu2);text-transform:uppercase}
+.tr2{display:flex;align-items:center;gap:10px}
+.live{display:flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;background:var(--s2);border:1px solid var(--bd);font-size:10.5px;font-weight:500;color:var(--mu2)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:bk 2s infinite;flex-shrink:0}
+.dot.err{background:var(--re);animation:none}.dot.ld{background:var(--o);animation:bk .6s infinite}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.2}}
+.btnr{background:transparent;border:1px solid var(--bd2);color:var(--mu2);padding:5px 13px;border-radius:var(--r);font-size:10.5px;font-weight:600;cursor:pointer;font-family:var(--font);transition:.15s}
+.btnr:hover{border-color:var(--o);color:var(--o)}
+
+/* ── Tabs ── */
+.tabs{display:flex;padding:0 24px;background:var(--s1);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 18px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);transition:color .15s}
+.tab:hover{color:var(--cr)}.tab.on{color:var(--o);border-bottom-color:var(--o)}
+
+/* ── Content ── */
+.content{padding:20px 24px;max-width:1440px;margin:0 auto}
+.panel{display:none}.panel.on{display:block}
+
+/* ── Grids ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:960px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g21{grid-template-columns:1fr}}
+@media(max-width:560px){.g4,.g3,.g2{grid-template-columns:1fr}}
+
+/* ── KPI Card ── */
+.kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px}
+.kpi.ao{border-top:2px solid var(--o)}
+.kpi.ag{border-top:2px solid var(--gr)}
+.kpi.ar{border-top:2px solid var(--re)}
+.kl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+.kv{font-size:26px;font-weight:800;line-height:1.1;color:var(--cr);letter-spacing:-.5px;word-break:break-word}
+.kv.or{color:var(--o)}.kv.gr{color:var(--gr)}.kv.re{color:var(--re)}
+.kv.xl{font-size:36px}
+.ks{font-size:10px;color:var(--mu2);margin-top:4px}
+
+/* ── Progress ── */
+.prog{height:3px;background:var(--s4);border-radius:99px;overflow:hidden;margin-top:8px}
+.pb{height:100%;background:var(--o);border-radius:99px;transition:width .7s ease}
+.pb.g{background:var(--gr)}.pb.r{background:var(--re)}
+
+/* ── Section header ── */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sh-t{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.sh-tag{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:var(--obg);color:var(--o);padding:2px 8px;border-radius:4px;border:1px solid var(--obr)}
+
+/* ── Card ── */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ct{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu2)}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);padding:6px 8px;border-bottom:1px solid var(--bd)}
+td{padding:8px 8px;border-bottom:1px solid var(--bd);color:var(--mu2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tn{font-weight:600;text-align:right;color:var(--cr)}
+.tname{color:var(--cr);font-weight:600}
+.pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.pg{background:var(--grbg);color:var(--gr)}.pr{background:var(--rebg);color:var(--re)}
+
+/* ── Canal cards ── */
+.cg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cc{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px}
+.cc.active{border-color:var(--obr)}
+.cn{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mu2);margin-bottom:5px}
+.cv{font-size:16px;font-weight:700;color:var(--cr);margin-bottom:5px}
+.cv.z{color:var(--mu);font-size:14px}
+.cb{height:3px;background:var(--s4);border-radius:99px;overflow:hidden}
+.cbf{height:100%;background:var(--o);border-radius:99px;transition:width .6s}
+.cp{font-size:9px;color:var(--mu);margin-top:4px}
+
+/* ── Visão Geral hero ── */
+.hero{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:28px;margin-bottom:12px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--o),#ff8050,var(--o));background-size:200%;animation:hg 3s linear infinite}
+@keyframes hg{0%{background-position:200%}100%{background-position:-200%}}
+
+.hero-logo{display:flex;justify-content:center;margin-bottom:16px}
+.hero-mes{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu2);text-align:center;margin-bottom:20px}
+
+.hero-body{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+
+
+/* meta values */
+.mv{display:flex;flex-direction:column;gap:12px}
+.mv-row .ml{font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);margin-bottom:3px}
+.mv-row .mval{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.mv-row .msub{font-size:10px;color:var(--mu2);margin-top:2px}
+
+/* barra progresso hero */
+.prog-hero{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.ph-lbl{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin-bottom:8px}
+.ph-track{height:8px;border-radius:99px;overflow:hidden;display:flex;margin-bottom:6px}
+.ph-g{background:var(--gr);transition:width .7s ease}
+.ph-r{background:var(--rebg);border:1px solid var(--rebr);transition:width .7s ease}
+.ph-labels{display:flex;justify-content:space-between;font-size:10px;font-weight:600}
+.ph-lg{color:var(--gr)}.ph-lr{color:var(--re)}
+
+/* ── Chart ── */
+.cw{position:relative;width:100%}
+.leg{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:500;color:var(--mu)}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+
+/* ── Hero nums (sem ring) ── */
+.hero-nums{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:8px}
+.hn-item{text-align:center;padding:0 32px}
+.hn-div{width:1px;height:60px;background:var(--bd2);flex-shrink:0}
+.hn-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+.hn-val{font-size:34px;font-weight:800;letter-spacing:-.5px;color:var(--cr)}
+.hn-val.gr{color:var(--gr)}.hn-val.re{color:var(--re)}.hn-val.or{color:var(--o)}
+.hn-sub{font-size:11px;font-weight:600;color:var(--mu2);margin-top:3px}
+
+/* ── Error / Loading ── */
+.err{background:var(--rebg);border:1px solid var(--rebr);border-radius:var(--r);padding:10px 14px;color:var(--re);font-size:12px;margin-bottom:14px;display:none}
+#ov{position:fixed;inset:0;background:var(--bk);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:999;transition:opacity .4s}
+#ov.gone{opacity:0;pointer-events:none}
+.ov-t{font-size:30px;font-weight:800;letter-spacing:4px;color:var(--o)}
+.ov-s{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu)}
+.ov-tr{width:160px;height:2px;background:var(--s2);border-radius:99px;overflow:hidden}
+.ov-b{height:100%;background:var(--o);animation:sw 1.2s ease-in-out infinite}
+@keyframes sw{0%{width:0%;margin-left:0}50%{width:55%}100%{width:0%;margin-left:100%}}
+</style>
+</head>
+<body>
+
+<div id="ov">
+  <div class="ov-t">SELLFY</div>
+  <div class="ov-s">Carregando dashboard</div>
+  <div class="ov-tr"><div class="ov-b"></div></div>
+</div>
+
+<header class="topbar">
+  <div class="tl">
+    <svg class="logo" viewBox="0 0 206 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clip-path="url(#lc)">
+        <path d="M159.957 53.668L168.546 85.507L176.825 53.668H187.326L173.324 100.63V124.352H162.186V100.312L150.888 63.538H133.226V85.19H147.546V95.06H133.226V124.352H122.086V53.668H159.957Z" fill="#F1F1EC"/>
+        <path d="M51.436 72.77H41.253C41.294 67.72 41.269 62.36 34.715 62.89C29.757 63.29 29.34 68.98 30.194 72.85C31.963 80.87 42.15 86.52 46.926 93.04C57.709 107.78 50.391 130 29.41 124.58C23.999 123.18 18.656 117.13 18.656 111.46V103.02H28.84C28.823 108.42 28.24 116.11 35.973 115.09C40.249 114.52 41.004 110.01 40.581 106.4C39.182 94.46 20.572 89.36 19.014 73.85C17.616 59.92 24.979 50.24 39.68 53.17C45.445 54.32 51.438 60.15 51.438 66.25V72.77H51.436Z" fill="#F1F1EC"/>
+        <path d="M83.26 53.668V63.538H64.166V83.598H79.441V93.468H64.166V114.482H83.26V124.352H53.027V53.668H83.26Z" fill="#F1F1EC"/>
+        <path d="M117.312 59.717H105.855V124.35H117.312V59.717Z" fill="#F1F1EC"/>
+        <path d="M100.128 82.959H88.672V124.35H100.128V82.959Z" fill="#F1F1EC"/>
+        <path d="M64.841 137.889C79.208 139.001 80.109 149.554 79.342 161.632C79.038 166.411 77.22 171.818 72.52 173.859L72.324 174.511C76.003 175.814 77.966 179.208 78.793 182.853C80.656 191.065 77.747 200.74 80.6 208.916H69.617C68.506 206.378 68.048 200.063 68.517 188.995C68.337 185.906 67.864 181.824 64.596 180.498L62.615 179.932H57.043V208.916H46.219V137.889H64.843ZM57.041 148.08V169.58C59.867 170.143 61.033 170.071 65.248 169.807C67.828 168.344 68.196 163.859 68.411 161.238C68.503 153.192 67.611 151.045 64.206 148.082H57.043Z" fill="#F1F1EC"/>
+        <path d="M99.626 137.339C111.274 136.021 118.886 141.471 119.753 153.339C119.178 166.314 120.523 179.947 119.769 192.844C119.065 204.875 112.124 210.482 100.164 209.564C86.012 194.737 84.916 181.128 85.996 152.367C86.631 144.323 91.362 138.273 99.626 137.338ZM101.852 147.206C97.291 151.247 96.539 165.927 96.539 180.879C97.291 195.559 108.228 200.691 108.58 194.391C107.858 181.061 109.658 166.513 108.627 153.326C108.311 149.291 106.173 146.675 101.854 147.208Z" fill="#F1F1EC"/>
+        <path d="M137.585 137.889V194.741C139.05 198.077 139.97 198.724 142.209 200.299C146.47 199.9 148.039 197.555 149.045 195.377V138.364L149.522 137.887H159.55V195.695C156.136 205.371 152.768 207.382 142.206 213.69C126.441 207.965 126.441 194.421 126.441 194.421V137.887H137.583Z" fill="#F1F1EC"/>
+        <path d="M38.893 161.777H28.386V152.382C25.938 146.957 21.888 146.486 19.247 148.016C16.737 152.597 16.592 154.916 15.782 167.953C16.917 182.221 17 195.305 17.938 200.652C26.404 201.01 27.978 195.926 28.681 193.658C28.713 183.041 27.91 179.295 27.91 179.295H23.293V169.421H38.893V194.423C32.786 208.873 25.041 209.548 14.052 210.507C5.768 194.12 4.889 180.341 5.786 151.748C7.077 141.01 14.289 136.435 24.737 137.241C32.637 137.849 38.893 144.356 38.893 152.382Z" fill="#F1F1EC"/>
+        <path d="M178.332 182.161V208.916H167.508V137.889H185.495C198.95 147.042 201.12 152.687 201.069 169.184C198.35 174.636 196.444 178.46 186.769 182.16H178.332ZM178.332 148.08V171.809L178.809 172.286H184.22C188.151 170.89 188.994 168.881 189.156 167.353C189.48 164.347 185.493 148.08 185.493 148.08H178.33Z" fill="#F1F1EC"/>
+      </g>
+      <defs><clipPath id="lc"><rect width="195" height="160" fill="white" transform="translate(5.5 52)"/></clipPath></defs>
+    </svg>
+    <div class="sep"></div>
+    <span class="lbl">Controle de Performance</span>
+  </div>
+  <div class="tr2">
+    <div class="live"><div class="dot" id="dot"></div><span id="upd">—</span></div>
+    <button class="btnr" onclick="load()">↻ Atualizar</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab on" onclick="go('geral',this)">Visão Geral</button>
+  <button class="tab"    onclick="go('aq',this)">Aquisição</button>
+  <button class="tab"    onclick="go('mon',this)">Monetização</button>
+  <button class="tab"    onclick="go('sdr',this)">SDR</button>
+  <button class="tab"    onclick="go('ss',this)">Social Selling</button>
+  <button class="tab"    onclick="go('pv',this)">Pré-Venda</button>
+</nav>
+
+<div class="content">
+<div id="errbox" class="err"></div>
+
+<!-- ══ VISÃO GERAL ══ -->
+<div id="p-geral" class="panel on">
+
+  <div class="hero">
+    <div class="hero-logo">
+      <!-- Logo laranja grande -->
+      <svg viewBox="0 0 206 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:44px">
+        <g clip-path="url(#hc)">
+          <path d="M159.957 0L168.546 31.84L176.825 0H187.326L173.324 46.96V70.68H162.186V46.64L150.888 9.87H133.226V31.52H147.546V41.39H133.226V70.68H122.086V0H159.957Z" fill="#FE4F18"/>
+          <path d="M51.436 18.1H41.253C41.294 13.05 41.269 7.7 34.715 8.22C29.757 8.62 29.34 14.31 30.194 18.18C31.963 26.2 42.15 31.85 46.926 38.37C57.709 53.11 50.391 75.33 29.41 69.91C23.999 68.51 18.656 62.46 18.656 56.79V48.35H28.84C28.823 53.75 28.24 61.44 35.973 60.42C40.249 59.85 41.004 55.34 40.581 51.73C39.182 39.8 20.572 34.7 19.014 19.18C17.616 5.25 24.979-4.43 39.68-1.5C45.445-.35 51.438 5.47 51.438 11.58V18.1H51.436Z" fill="#FE4F18"/>
+          <path d="M83.26 0V9.87H64.166V29.93H79.441V39.8H64.166V60.81H83.26V70.68H53.027V0H83.26Z" fill="#FE4F18"/>
+          <path d="M117.312 5.05H105.855V70.68H117.312V5.05Z" fill="#FE4F18"/>
+          <path d="M100.128 28.29H88.672V70.68H100.128V28.29Z" fill="#FE4F18"/>
+        </g>
+        <defs><clipPath id="hc"><rect width="195" height="80" fill="white" transform="translate(5.5 -4)"/></clipPath></defs>
+      </svg>
+    </div>
+    <div class="hero-mes" id="g-mes">MAIO 2025</div>
+
+    <div class="hero-nums">
+      <div class="hn-item">
+        <div class="hn-lbl">Meta Total (Aq + Mon)</div>
+        <div class="hn-val" id="g-meta">—</div>
+      </div>
+      <div class="hn-div"></div>
+      <div class="hn-item">
+        <div class="hn-lbl">Assinado</div>
+        <div class="hn-val gr" id="g-assinado">—</div>
+        <div class="hn-sub" id="g-rpct">—</div>
+      </div>
+      <div class="hn-div"></div>
+      <div class="hn-item">
+        <div class="hn-lbl">Falta para Meta</div>
+        <div class="hn-val re" id="g-falta">—</div>
+        <div class="hn-sub" id="g-pfalta">—% restante</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- barra progresso -->
+  <div class="prog-hero">
+    <div class="ph-lbl">Progresso Consolidado</div>
+    <div class="ph-track">
+      <div class="ph-g" id="ph-g" style="width:0%"></div>
+      <div class="ph-r" id="ph-r" style="width:100%"></div>
+    </div>
+    <div class="ph-labels">
+      <span class="ph-lg">Assinado <span id="ph-gv">—</span></span>
+      <span class="ph-lr">Falta <span id="ph-rv">—</span></span>
+    </div>
+  </div>
+
+  <!-- grid operacional -->
+  <div class="g4">
+    <div class="kpi ao"><div class="kl">Reuniões Marcadas</div><div class="kv" id="g-mk">—</div><div class="ks">SDR · col F17</div></div>
+    <div class="kpi ag"><div class="kl">Reuniões Acontecidas</div><div class="kv gr" id="g-ac">—</div><div class="ks">SDR · col D17</div></div>
+    <div class="kpi ar"><div class="kl">No-Show</div><div class="kv re" id="g-ns">—</div><div class="ks">SDR · col E17</div></div>
+    <div class="kpi"><div class="kl">Taxa de Comparecimento</div><div class="kv" id="g-txcomp">—</div><div class="ks">Acontecidas / Marcadas</div></div>
+  </div>
+
+  <div class="g4">
+    <div class="kpi"><div class="kl">Taxa de Conversão</div><div class="kv or" id="g-txconv">—</div><div class="ks">Painel de Aquisição</div></div>
+    <div class="kpi"><div class="kl">Ideal / Dia — Aquisição</div><div class="kv" id="g-ideal-aq">—</div></div>
+    <div class="kpi"><div class="kl">Ideal / Dia — Monetização</div><div class="kv" id="g-ideal-mon">—</div></div>
+    <div class="kpi"><div class="kl">Pré-Qualificados SS</div><div class="kv or" id="g-pq">—</div><div class="ks">Controle Social Selling · G10:G40</div></div>
+  </div>
+
+  <div class="g3">
+    <div class="kpi ag"><div class="kl">Cash Collected Total</div><div class="kv gr" id="g-cash">—</div><div class="prog"><div class="pb g" id="g-cashbar" style="width:0%"></div></div></div>
+    <div class="kpi"><div class="kl">% Meta Cash</div><div class="kv" id="g-pctcash">—</div><div class="ks">Aq + Mon consolidado</div></div>
+    <div class="kpi"><div class="kl">Meta Cash Total</div><div class="kv" id="g-metacash">—</div></div>
+  </div>
+
+</div>
+
+<!-- ══ AQUISIÇÃO ══ -->
+<div id="p-aq" class="panel">
+  <div class="sh"><span class="sh-t">Aquisição</span><span class="sh-tag" id="aq-mes">Maio</span></div>
+  <div class="g4">
+    <div class="kpi ao"><div class="kl">Meta</div><div class="kv" id="aq-meta">—</div></div>
+    <div class="kpi ao"><div class="kl">Assinado</div><div class="kv" id="aq-assinado">—</div><div class="prog"><div class="pb" id="aq-pb" style="width:0%"></div></div></div>
+    <div class="kpi"><div class="kl">% Meta</div><div class="kv" id="aq-pct">—</div></div>
+    <div class="kpi"><div class="kl">Taxa de Conversão</div><div class="kv" id="aq-conv">—</div></div>
+    <div class="kpi"><div class="kl">Ideal / Dia</div><div class="kv" id="aq-ideal">—</div></div>
+    <div class="kpi"><div class="kl">Cash Collected</div><div class="kv" id="aq-cash">—</div><div class="prog"><div class="pb g" id="aq-cashb" style="width:0%"></div></div></div>
+    <div class="kpi"><div class="kl">% Meta Cash</div><div class="kv" id="aq-pctcash">—</div></div>
+    <div class="kpi"><div class="kl">Ticket Médio</div><div class="kv" id="aq-ticket">—</div></div>
+  </div>
+  <div class="g3">
+    <div class="kpi"><div class="kl">Vendas ICV</div><div class="kv or" id="aq-nicv">—</div></div>
+    <div class="kpi"><div class="kl">Vendas Pilar</div><div class="kv or" id="aq-npilar">—</div></div>
+    <div class="kpi"><div class="kl">Perdido no Mês</div><div class="kv re" id="aq-perdido">—</div></div>
+  </div>
+  <div class="g21">
+    <div class="card">
+      <div class="ch"><span class="ct">Pipeline de Vendas</span></div>
+      <table><thead><tr><th>Status</th><th>Cliente</th><th>Canal</th><th>Produto</th><th style="text-align:right">Valor</th><th style="text-align:right">Cash</th></tr></thead>
+      <tbody id="tb-aq"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Canais — Assinado</span></div>
+      <div class="cg" id="canais"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MONETIZAÇÃO ══ -->
+<div id="p-mon" class="panel">
+  <div class="sh"><span class="sh-t">Monetização</span><span class="sh-tag">Maio</span></div>
+  <div class="g4">
+    <div class="kpi ao"><div class="kl">Meta</div><div class="kv" id="mon-meta">—</div></div>
+    <div class="kpi ao"><div class="kl">Assinado</div><div class="kv" id="mon-assinado">—</div><div class="prog"><div class="pb" id="mon-pb" style="width:0%"></div></div></div>
+    <div class="kpi"><div class="kl">% Meta</div><div class="kv" id="mon-pct">—</div></div>
+    <div class="kpi"><div class="kl">Ideal / Dia</div><div class="kv" id="mon-ideal">—</div></div>
+    <div class="kpi"><div class="kl">Cash Collected</div><div class="kv" id="mon-cash">—</div></div>
+    <div class="kpi"><div class="kl">% Meta Cash</div><div class="kv" id="mon-pctcash">—</div></div>
+    <div class="kpi"><div class="kl">Vendas ICV</div><div class="kv or" id="mon-nicv">—</div></div>
+    <div class="kpi"><div class="kl">Ticket Médio</div><div class="kv" id="mon-ticket">—</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Pipeline Monetização</span></div>
+    <table><thead><tr><th>Status</th><th>Cliente</th><th>Canal</th><th>Produto</th><th style="text-align:right">Valor</th><th style="text-align:right">Cash</th></tr></thead>
+    <tbody id="tb-mon"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ SDR ══ -->
+<div id="p-sdr" class="panel">
+  <div class="sh"><span class="sh-t">SDR</span><span class="sh-tag">Maio</span></div>
+  <div class="g4">
+    <div class="kpi ao"><div class="kl">Acontecidas</div><div class="kv or xl" id="sdr-ac">—</div><div class="ks">D17</div></div>
+    <div class="kpi ar"><div class="kl">No-Show</div><div class="kv re xl" id="sdr-ns">—</div><div class="ks">E17</div></div>
+    <div class="kpi"><div class="kl">Marcadas</div><div class="kv xl" id="sdr-mk">—</div><div class="ks">F17</div></div>
+    <div class="kpi"><div class="kl">Taxa de Comparecimento</div><div class="kv" id="sdr-tx">—</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Gladisson Tayller — Diário</span></div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:#FE4F18"></div>Acontecidas</div>
+      <div class="li"><div class="ld" style="background:#2a2e33"></div>Marcadas</div>
+      <div class="li"><div class="ld" style="background:#ef4444"></div>No-Show</div>
+    </div>
+    <div class="cw" style="height:260px"><canvas id="c-sdr"></canvas></div>
+  </div>
+</div>
+
+<!-- ══ SOCIAL SELLING ══ -->
+<div id="p-ss" class="panel">
+  <div class="sh"><span class="sh-t">Social Selling</span><span class="sh-tag">Maio</span></div>
+  <div class="g4">
+    <div class="kpi ao"><div class="kl">Pré-Qualificados</div><div class="kv or xl" id="ss-pq">—</div><div class="ks">Soma G10:G40</div></div>
+    <div class="kpi"><div class="kl">Reuniões Marcadas</div><div class="kv xl" id="ss-mk">—</div></div>
+    <div class="kpi ag"><div class="kl">Reuniões Acontecidas</div><div class="kv gr xl" id="ss-ac">—</div></div>
+    <div class="kpi"><div class="kl">—</div><div class="kv" style="color:var(--mu)">—</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Pré-Qualificados por Dia (col G)</span></div>
+      <div class="cw" style="height:240px"><canvas id="c-ss1"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Taxa de Agendamento (%)</span></div>
+      <div class="cw" style="height:240px"><canvas id="c-ss2"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRÉ-VENDA ══ -->
+<div id="p-pv" class="panel">
+  <div class="sh"><span class="sh-t">Pré-Venda</span><span class="sh-tag">Maio</span></div>
+  <div class="g2">
+    <div class="kpi ao">
+      <div class="kl">Reuniões Acontecidas</div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="kv xl" id="pv-ac">—</div>
+        <div style="font-size:13px;color:var(--mu)">/ <span id="pv-mac">—</span></div>
+      </div>
+      <div class="prog" style="margin-top:10px"><div class="pb" id="pv-acb" style="width:0%"></div></div>
+      <div class="ks" style="margin-top:5px"><span id="pv-acp">—</span>% da meta</div>
+    </div>
+    <div class="kpi">
+      <div class="kl">Reuniões Marcadas</div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="kv xl" id="pv-mk">—</div>
+        <div style="font-size:13px;color:var(--mu)">/ <span id="pv-mmk">—</span></div>
+      </div>
+      <div class="prog" style="margin-top:10px"><div class="pb" id="pv-mkb" style="width:0%"></div></div>
+      <div class="ks" style="margin-top:5px"><span id="pv-mkp">—</span>% da meta</div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="kpi"><div class="kl">Faltam Acontecidas</div><div class="kv re" id="pv-fa">—</div></div>
+    <div class="kpi"><div class="kl">Faltam Marcadas</div><div class="kv re" id="pv-fm">—</div></div>
+  </div>
+</div>
+</div><!-- content -->
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const APIURL   = 'https://script.google.com/macros/s/AKfycbyIsf46M3yS6y5BXJ7krGTQEftVvInecdol5gypFLLAlTYWUfRv_jz9fpxqYbsH3lc8/exec';
+const INTERVAL = 30000;
+
+// ── Utils ───────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const st = (id, v) => { const e=$(id); if(e) e.textContent=v; };
+const pr = (id, v) => { const e=$(id); if(e) e.style.width=Math.min(Math.max(+v||0,0),100)+'%'; };
+
+// Formata número no padrão brasileiro com máx 2 casas decimais
+// Ex: 6376.19 → "6.376,19" | 184100 → "184.100"
+function fmtNum(v, isCurrency=true) {
+  const n = Math.round((+v||0) * 100) / 100;
+  const abs = Math.abs(n);
+  const neg = n < 0;
+  // Separa inteiro e decimal
+  const dec = abs % 1;
+  const decStr = dec > 0 ? ',' + (dec.toFixed(2)).slice(2).replace(/0+$/, '') : '';
+  // Formata inteiro com pontos de milhar
+  const intStr = Math.floor(abs).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const num = (neg ? '-' : '') + intStr + decStr;
+  return isCurrency ? 'R$ ' + num : num;
+}
+
+// Percentual: máx 2 casas, sem zeros à direita
+function pct(v, dec=1) {
+  const n = Math.round((+v||0) * 10) / 10;
+  return n.toFixed(dec) + '%';
+}
+
+// Atalhos
+const brl     = v => fmtNum(v, true);
+const brlAuto = v => fmtNum(v, true);
+
+function colorV(id, v, ok=100) {
+  const e=$(id); if(!e) return;
+  e.classList.remove('or','gr','re');
+  if(v>=ok) e.classList.add('gr');
+  else if(v>=ok*.7) e.classList.add('or');
+  else e.classList.add('re');
+}
+
+let charts={};
+function mk(id,cfg){ if(charts[id]) charts[id].destroy(); const el=$(id); if(el) charts[id]=new Chart(el,cfg); }
+
+const AX={
+  x:{ticks:{color:'#4a5261',font:{family:'Poppins',size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+  y:{ticks:{color:'#4a5261',font:{family:'Poppins',size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}
+};
+
+// ── Tabs ────────────────────────────────────────────────────
+function go(n,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  $('p-'+n).classList.add('on'); btn.classList.add('on');
+}
+
+// ── Fetch ───────────────────────────────────────────────────
+async function load(){
+  const d=$('dot'); d.className='dot ld';
+  try{
+    const r=await fetch(APIURL+'?nc='+Date.now(),{cache:'no-store'});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'Erro desconhecido');
+    render(j.data);
+    $('upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR');
+    d.className='dot';
+    $('errbox').style.display='none';
+    $('ov').classList.add('gone');
+  }catch(e){
+    d.className='dot err';
+    const eb=$('errbox'); eb.style.display='block'; eb.textContent='⚠ '+e.message;
+    $('ov').classList.add('gone');
+  }
+}
+
+function render(d){ rG(d.geral); rAq(d.aquisicao); rMon(d.monetizacao); rSDR(d.sdr); rSS(d.socialSelling); rPV(d.preVenda); }
+
+// ── Visão Geral ──────────────────────────────────────────────
+function rG(g){
+  if(!g) return;
+  st('g-mes',(g.mesAtual||'Maio').toUpperCase()+' 2025');
+  st('g-meta',    brl(g.metaTotal));
+  st('g-assinado',brl(g.assinadoTotal));
+  st('g-falta',   brl(g.faltaMeta));
+  st('g-rpct',    pct(g.pctMetaTotal,1));
+  st('g-pfalta',  pct(g.pctMetaTotal>=100?0:100-g.pctMetaTotal,1)+' restante');
+  st('g-mk',      g.reunioesMarcadas);
+  st('g-ac',      g.reunioesAcontecidas);
+  st('g-ns',      g.noShow);
+  st('g-txcomp',  pct(g.txComp,1));
+  st('g-txconv',  pct(g.txConversao,1));
+  st('g-ideal-aq',  brlAuto(g.idealDiaAq));
+  st('g-ideal-mon', brlAuto(g.idealDiaMon));
+  st('g-pq',      g.preQualificados);
+  st('g-cash',    brl(g.cashTotal));
+  st('g-pctcash', pct(g.pctCashTotal,1));
+  st('g-metacash',brl(g.metaCashTotal));
+  colorV('g-txcomp', g.txComp, 70);
+  colorV('g-pctcash', g.pctCashTotal);
+
+  const p=Math.min(g.pctMetaTotal,100);
+  $('ph-g').style.width=p.toFixed(1)+'%';
+  $('ph-r').style.width=(100-p).toFixed(1)+'%';
+  st('ph-gv', pct(p,1));
+  st('ph-rv', pct(100-p,1));
+  pr('g-cashbar', g.pctCashTotal);
+
+}
+
+// ── Aquisição ────────────────────────────────────────────────
+function rAq(a){
+  if(!a) return;
+  st('aq-mes',    a.mesAtual||'Maio');
+  st('aq-meta',   brl(a.meta));
+  st('aq-assinado',brl(a.assinado));
+  st('aq-pct',    pct(a.pctMeta));
+  st('aq-conv',   pct(a.txConversao));
+  st('aq-ideal',  brlAuto(a.idealDia));
+  st('aq-cash',   brl(a.cashCollected));
+  st('aq-pctcash',pct(a.pctCash));
+  st('aq-ticket', brl(a.ticketMedio));
+  st('aq-nicv',   a.nICV);
+  st('aq-npilar', a.nPilar);
+  st('aq-perdido',brl(a.perdido));
+  colorV('aq-pct',a.pctMeta); colorV('aq-pctcash',a.pctCash);
+  pr('aq-pb',a.pctMeta); pr('aq-cashb',a.pctCash);
+
+  $('tb-aq').innerHTML=(a.pipeline||[]).map(p=>`
+    <tr>
+      <td><span class="pill ${p.status==='Ganho'?'pg':'pr'}">${p.status}</span></td>
+      <td class="tname">${p.cliente}</td>
+      <td>${p.canal||'—'}</td><td>${p.produto||'—'}</td>
+      <td class="tn">${brl(p.valor)}</td>
+      <td class="tn" style="color:${p.cash>0?'var(--gr)':'var(--mu)'}">${p.cash>0?brl(p.cash):'—'}</td>
+    </tr>`).join('');
+
+  const mx=Math.max(...(a.canais||[]).map(c=>c.assinado),1);
+  $('canais').innerHTML=(a.canais||[]).map(c=>{
+    const w=(c.assinado/mx*100).toFixed(1);
+    const p2=a.meta>0?(c.assinado/a.meta*100).toFixed(1):'0';
+    return `<div class="cc ${c.assinado>0?'active':''}">
+      <div class="cn">${c.canal}</div>
+      <div class="cv ${c.assinado>0?'':'z'}">${c.assinado>0?brl(c.assinado):'—'}</div>
+      <div class="cb"><div class="cbf" style="width:${w}%"></div></div>
+      ${c.assinado>0?`<div class="cp">${p2}% da meta</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Monetização ──────────────────────────────────────────────
+function rMon(m){
+  if(!m) return;
+  st('mon-meta',    brl(m.meta)); st('mon-assinado',brl(m.assinado));
+  st('mon-pct',     pct(m.pctMeta)); st('mon-ideal',brlAuto(m.idealDia));
+  st('mon-cash',    brl(m.cashCollected)); st('mon-pctcash',pct(m.pctCash));
+  st('mon-nicv',    m.nICV); st('mon-ticket',brl(m.ticketMedio));
+  colorV('mon-pct',m.pctMeta); pr('mon-pb',m.pctMeta);
+  $('tb-mon').innerHTML=(m.pipeline||[]).map(p=>`
+    <tr>
+      <td><span class="pill ${p.status==='Ganho'?'pg':'pr'}">${p.status}</span></td>
+      <td class="tname">${p.cliente}</td>
+      <td>${p.canal||'—'}</td><td>${p.produto||'—'}</td>
+      <td class="tn">${brl(p.valor)}</td>
+      <td class="tn" style="color:${p.cash>0?'var(--gr)':'var(--mu)'}">${p.cash>0?brl(p.cash):'—'}</td>
+    </tr>`).join('');
+}
+
+// ── SDR ──────────────────────────────────────────────────────
+function rSDR(s){
+  if(!s) return;
+  const t=s.totais||{};
+  const tc=t.marcadas>0?((t.acontecidas/t.marcadas)*100).toFixed(1)+'%':'0%';
+  st('sdr-ac',t.acontecidas||0);
+  st('sdr-ns',t.noShow||0);
+  st('sdr-mk',t.marcadas||0);
+  st('sdr-tx',tc);
+  const dias=(s.diario||[]).filter(d=>d.acontecidas>0||d.marcadas>0||d.noShow>0);
+  mk('c-sdr',{type:'bar',data:{labels:dias.map(d=>d.data),datasets:[
+    {label:'Acontecidas',data:dias.map(d=>d.acontecidas),backgroundColor:'#FE4F18',borderRadius:3},
+    {label:'Marcadas',   data:dias.map(d=>d.marcadas),   backgroundColor:'#2a2e33',borderRadius:3},
+    {label:'No-Show',    data:dias.map(d=>d.noShow),     backgroundColor:'#ef4444',borderRadius:3},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{...AX.x,ticks:{...AX.x.ticks,autoSkip:false,maxRotation:45}},y:AX.y}}});
+}
+
+// ── Social Selling ────────────────────────────────────────────
+function rSS(ss){
+  if(!ss) return;
+  st('ss-pq',ss.totPreQual||0);
+  st('ss-mk',ss.totMarcadas||0);
+  st('ss-ac',ss.totAcontecidas||0);
+  const dias=(ss.diario||[]).filter(d=>d.preQualificados>0);
+  mk('c-ss1',{type:'bar',data:{labels:dias.map(d=>d.data),datasets:[{label:'Pré-Qual.',data:dias.map(d=>d.preQualificados),backgroundColor:'#FE4F18',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:AX.x,y:AX.y}}});
+  const diasT=(ss.diario||[]).filter(d=>d.txAgendamento>0);
+  mk('c-ss2',{type:'line',data:{labels:diasT.map(d=>d.data),datasets:[{label:'Taxa %',data:diasT.map(d=>d.txAgendamento),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.08)',tension:.4,fill:true,pointBackgroundColor:'#22c55e',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:AX.x,y:{...AX.y,ticks:{...AX.y.ticks,callback:v=>v+'%'}}}}});
+}
+
+// ── Pré-Venda ─────────────────────────────────────────────────
+function rPV(pv){
+  if(!pv) return;
+  st('pv-ac', pv.ac); st('pv-mac',pv.metaAc);
+  st('pv-mk', pv.mk); st('pv-mmk',pv.metaMk);
+  st('pv-fa', pv.faltaAc); st('pv-fm',pv.faltaMk);
+  st('pv-acp',pv.pctAc.toFixed(1)); st('pv-mkp',pv.pctMk.toFixed(1));
+  pr('pv-acb',pv.pctAc); pr('pv-mkb',pv.pctMk);
+}
+
+load();
+setInterval(load, INTERVAL);
+</script>
+</body>
+</html>
